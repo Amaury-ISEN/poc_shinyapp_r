@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1625651659768.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "983C5EEB",
+    "lastKnownWriteTime" : 1626679081,
+    "last_content_update" : 1626679081879,
+    "path" : "~/microsoft_ia/Projet_groupes/POC Shiny R/app.R",
+    "project_path" : "app.R",
+    "properties" : {
+        "cursorPosition" : "15,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

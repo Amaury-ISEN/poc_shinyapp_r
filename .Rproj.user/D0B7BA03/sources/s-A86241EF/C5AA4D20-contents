@@ -1,0 +1,127 @@
+---
+title: "Interactive ML - Linear Regression"
+output:
+  flexdashboard::flex_dashboard:
+    theme: spacelab
+    vertical_layout: fill
+    orientation: columns
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(shiny)
+library(DT)
+library(dplyr)
+library(plotly)
+```
+
+```{r data}
+housing <- read.csv("Dataset_R_Shiny.csv")
+variables <- c("squareMeters", "numberOfRooms", "hasYard", "hasPool", "floors", "cityCode", "cityPartRange", "numPrevOwners", "made", "isNewBuilt", "hasStormProtector", "basement", "attic", "garage", "hasStorageRoom", "hasGuestRoom")
+```
+
+Column {.sidebar data-width=200}
+-----------------------------------------------------------------
+
+```{r inputs}
+selectInput("variable_choice", label = h5("Choose one or more input variables"), 
+            choices = variables, variables[1], multiple = TRUE)
+```
+
+
+```{r reactive expression}
+model1 <- reactive({
+  vars <- as.matrix(housing[, input$variable_choice])
+  lm(price ~ vars, data = housing)})
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+###
+
+```{r model output}
+renderPrint({ 
+   
+summary(model1())})
+
+```
+
+###
+
+```{r table}
+DT::renderDataTable({
+
+ DT::datatable(housing %>% mutate(predicted = predict(model1()), residuals = residuals(model1())) %>% select(price, predicted, residuals), 
+ rownames = FALSE, colnames = c('actual price', 'predicted price', 'residuals'), extensions = c('Buttons', 'Responsive'), 
+ options = list(columnDefs = list(list(className = 'dt-center', targets = "_all")), dom = 'Blfrt', 
+ buttons = c('copy', 'csv', 'excel', 'print'), searching = FALSE, lengthMenu = c(20, 100, 1000, nrow(housing)), scrollY = 300, scrollCollapse = TRUE)) %>% 
+ formatCurrency(c('price', 'predicted', 'residuals'))})
+
+```
+
+Column {data-width=400}
+-----------------------------------------------------------------------
+
+###
+
+```{r scatter}
+renderPlotly({
+
+plot_ly(data = housing, y = ~predict(model1()), x = ~price,
+               type = "scatter", mode = "markers",
+               marker = list(size = 5,
+                             color = '#FFFFFF',
+                             line = list(color = '#EA6345', 
+                                         width = 2))) %>% 
+  layout(title = '',
+         yaxis = list(zeroline = FALSE, title = "predicted price", titlefont = list(
+  family = "Lucida Console, Courier New, monospace", size = 12, color = "#FFFFFF"), tickfont = list(
+  family = "Lucida Console, Courier New, monospace", size = 10, color = "#FFFFFF"), color =  "white", size = 2),
+         xaxis = list(zeroline = FALSE, title = "actual price", titlefont = list(
+  family = "Lucida Console, Courier New, monospace", size = 12, color = "#FFFFFF"), tickfont = list(
+  family = "Lucida Console, Courier New, monospace", size = 10, color = "#FFFFFF"), color =  "white", size = 7)) %>%
+  layout(plot_bgcolor='#678EB9', paper_bgcolor='#678EB9')})
+
+```
+
+###
+
+```{r histogram}
+renderPlotly({
+  
+
+plot_ly(housing, x = ~round(residuals(model1()),2), type = "histogram", marker = list(color = "#EA6345",
+                            line = list(color = "#FFFFFF", width = 1))) %>%   layout(title = '',
+         yaxis = list(zeroline = FALSE, title = "frequency",  titlefont = list(
+  family = "Lucida Console, Courier New, monospace", size = 12, color = "#FFFFFF"), 
+  tickfont = list(
+  family = "Lucida Console, Courier New, monospace", size = 10, color = "#FFFFFF"), color =  "white"),
+         xaxis = list(zeroline = FALSE, title = "residual",  titlefont = list(
+  family = "Lucida Console, Courier New, monospace", size = 12, color = "#FFFFFF"), 
+  tickfont = list(
+  family = "Lucida Console, Courier New, monospace", size = 10, color = "#FFFFFF"), color =  "white")) %>%
+  layout(plot_bgcolor='#678EB9', paper_bgcolor='#678EB9')})
+
+```
+
+
+```{css}
+
+.dt-center {
+  background-color: #678EB9;
+  color: #FFFFFF;
+  font-family: "Lucida Console", "Courier New", monospace; 
+  font-size: 12px;
+}
+
+#section-section .shiny-bound-output {
+  background-color: #678EB9;
+  color: #FFFFFF;
+  font-family: "Lucida Console", "Courier New", monospace; 
+  font-size: 12px;
+}
+
+
+```

@@ -1,0 +1,4 @@
+"0","library(flexdashboard)"
+"2","Error in library(flexdashboard) : 
+  aucun package nommé ‘flexdashboard’ n'est trouvé
+"
